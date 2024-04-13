@@ -1,16 +1,14 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
 const createError = require("../error.js");
 const db = require("../models/index.js");
 
+const dotenv = require("dotenv");
 dotenv.config();
 
-const userRegister = async (req, res, next) => {
+const register = async (req, res, next) => {
   try {
-    // console.log("Register function called");
-    const { name, email, password, age, phone, location } = req.body;
-    // console.log(`Email: ${email}, Password: ${password}, Name: ${name}`);
+    const { name, email, password, phone, location } = req.body;
 
     // Check if the email is in use
     const existingUser = await db.models.User.findOne({ where: { email } });
@@ -18,7 +16,7 @@ const userRegister = async (req, res, next) => {
     if (existingUser) {
       return next(createError(409, "Email is already in use."));
     }
-
+    
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -26,20 +24,21 @@ const userRegister = async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
-      age,
       phone,
       location,
     });
-    const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN, {
+    const createdUser = await user.save();
+    const token = jwt.sign({ id: createdUser.id }, process.env.JWT_TOKEN, {
       expiresIn: "365d",
     });
+    console.log("Token register: ", token);
     return res.status(200).json({ message: 'Register successful', token, user });
   } catch (error) {
     return next(error);
   }
 };
 
-const userLogin = async (req, res, next) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -55,9 +54,10 @@ const userLogin = async (req, res, next) => {
       return next(createError(403, "Incorrect password"));
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN, {
-      expiresIn: "365d",
+    const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN, {  
+      expiresIn: "365d" 
     });
+    console.log("Token login: ", token);
     return res.status(200).json({ message: 'Login successful', token, user });
   } catch (error) {
     return next(error);
@@ -65,6 +65,6 @@ const userLogin = async (req, res, next) => {
 };
 
 module.exports = {
-  userRegister,
-  userLogin,
+  register,
+  login,
 };

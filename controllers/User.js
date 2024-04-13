@@ -30,7 +30,7 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { name, password, age, phone, location } = req.body;
+      const { name, password, gender, age, weight, height, phone, location } = req.body;
       const user = await db.models.User.findOne({ where: { id } });
       if (!user) {
         return next(createError(404, "User not found"));
@@ -41,9 +41,13 @@ const updateUser = async (req, res, next) => {
         const hashedPassword = bcrypt.hashSync(password, salt);
         user.password = hashedPassword;
       }
+      user.gender = gender || user.gender;
       user.age = age || user.age;
+      user.weight = weight || user.weight;
+      user.height = weight || user.height;
       user.phone = phone || user.phone;
       user.location = location || user.location;
+
       await user.save();
       return res.status(200).json({ message: 'User updated successfully', user });
     } catch (error) {

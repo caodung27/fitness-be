@@ -28,6 +28,8 @@ db.sequelize = sequelize;
 db.models = {};
 
 db.models.User = require("./User")(sequelize, Sequelize.DataTypes);
+db.models.Path = require("./Path")(sequelize, Sequelize.DataTypes);
+
 
 Object.keys(db.models).forEach((modelName) => {
   if (db.models[modelName].associate) {
