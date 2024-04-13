@@ -15,9 +15,21 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     age: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
+    },
+    weight: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    height: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
     },
     phone: {
       type: DataTypes.STRING,
@@ -30,6 +42,13 @@ module.exports = (sequelize) => {
   }, {
     timestamps: true,
   });
+  
+  User.associate = (models) => {
+    User.hasMany(models.Path, {
+      foreignKey: 'userId',
+      as: 'paths',
+    });
+  };
 
   return User;
 };
