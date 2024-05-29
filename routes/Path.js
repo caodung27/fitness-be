@@ -5,14 +5,14 @@ const { verifyToken } = require("../middleware/verifyToken");
 const router = express.Router();
 
 // Record a new path
-router.post("/:userId/create", verifyToken, recordPath);
+router.post("/create", verifyToken, recordPath);
 
 // Get path history
-router.get("/:userId", verifyToken, getPathHistory);
+router.get("/", verifyToken, getPathHistory);
 
 // Search paths
-router.get("/:userId/search/date-time", verifyToken, searchPathsByDateTime);
-router.get("/:userId/search/location", verifyToken, searchPathsByLocation);
-router.get("/:userId/search/speed", verifyToken, searchPathsBySpeed);
+router.get("/search/date-time", verifyToken, searchPathsByDateTime);
+router.get("/search/location", verifyToken, searchPathsByLocation);
+router.get("/search/speed", verifyToken, searchPathsBySpeed);
 
 module.exports = router;
