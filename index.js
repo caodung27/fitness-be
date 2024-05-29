@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 // Routes
 app.use("/auth", authRouter); // Authentication routes
 app.use("/user", userRouter); // User-related routes
-app.use("/path", pathRouter); // Path-related routes
+app.use("/:userId/path", pathRouter); // Path-related routes
 
 // Error handler middleware
 app.use((err, req, res, next) => {
