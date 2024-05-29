@@ -1,57 +1,78 @@
-const { DataTypes } = require("sequelize");
 const geolib = require("geolib");
 
-module.exports = (sequelize) => {
-  const Path = sequelize.define("Path",{
+module.exports = (mongoose) => {
+  const { Schema } = mongoose;
+
+  // Define the Point schema for coordinates
+  const PointSchema = new Schema({
     type: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      enum: ['Point'],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+  });
+
+  // Define the Path schema
+  const PathSchema = new Schema({
+    type: {
+      type: String,
+      required: true
     },
     start: {
-      type: DataTypes.GEOMETRY('POINT'),
-      allowNull: false,
+      type: PointSchema,
+      required: true
     },
     end: {
-      type: DataTypes.GEOMETRY('POINT'),
-      allowNull: false,
+      type: PointSchema,
+      required: true
     },
     speed: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
+      type: Number,
+      required: false
     },
     distance: {
-      type: DataTypes.VIRTUAL, 
-      get() {
+      type: Number,
+      required: false,
+      get: function() {
         if (this.start && this.end) {
-          const start = { latitude: this.start.coordinates[0], longitude: this.start.coordinates[1] };
-          const end = { latitude: this.end.coordinates[0], longitude: this.end.coordinates[1] };
+          const start = { latitude: this.start.coordinates[1], longitude: this.start.coordinates[0] };
+          const end = { latitude: this.end.coordinates[1], longitude: this.end.coordinates[0] };
           return geolib.getDistance(start, end);
         }
         return null;
       }
     },
     steps: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
+      type: Number,
+      required: false
     },
     calories: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
+      type: Number,
+      required: false
     },
-  },
-  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    }
+  }, {
     timestamps: true,
+    toJSON: { getters: true },
+    toObject: { getters: true } 
   });
 
-  Path.associate = (models) => {
-    Path.belongsTo(models.User, {
-      foreignKey: {
-        name: "userId",
-        allowNull: false
-      },
-      as: "users",
-    });
-  };
+  PathSchema.virtual('user', {
+    ref: 'User',
+    localField: 'userId',
+    foreignField: '_id',
+    justOne: true
+  });
+
+  const Path = mongoose.model('Path', PathSchema);
 
   return Path;
 };
