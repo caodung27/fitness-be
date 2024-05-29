@@ -1,40 +1,33 @@
-const Sequelize = require("sequelize");
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const db = {};
+// MongoDB URI from environment variables
+const mongoURI = process.env.MONGO_URI;
 
-const sequelize = new Sequelize(
-  process.env.DB,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: "localhost",
-    dialect: "mysql",
-  }
-);
-async function testConnection() {
+// Establish MongoDB connection
+async function connectDB() {
   try {
-    await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true, // Ensure unique fields are indexed
+      useFindAndModify: false // To suppress deprecation warnings for findOneAndUpdate
+    });
+    console.log("MongoDB connection established successfully");
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("MongoDB connection failed:", error);
+    process.exit(1); // Exit with failure
   }
 }
 
-testConnection();
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
-db.models = {};
+// Invoke MongoDB connection function
+connectDB();
 
-db.models.User = require("./User")(sequelize, Sequelize.DataTypes);
-db.models.Path = require("./Path")(sequelize, Sequelize.DataTypes);
-
-
-Object.keys(db.models).forEach((modelName) => {
-  if (db.models[modelName].associate) {
-    db.models[modelName].associate(db.models);
-  }
-});
+// Define models and export
+const db = {};
+db.mongoose = mongoose; // Expose mongoose instance
+db.User = require("./User")(mongoose);
+db.Path = require("./Path")(mongoose);
 
 module.exports = db;

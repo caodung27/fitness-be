@@ -1,54 +1,50 @@
-const { DataTypes } = require('sequelize');
+const mongoose = require("mongoose");
 
-module.exports = (sequelize) => {
-  const User = sequelize.define('User', {
+const UserSchema = new mongoose.Schema(
+  {
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+      type: String,
+      required: true,
+      unique: true, // Ensures email is unique
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    gender: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    age: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    weight: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    height: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
+      type: String,
+      required: true,
     },
     phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     location: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
-  }, {
-    timestamps: true,
-  });
-  
-  User.associate = (models) => {
-    User.hasMany(models.Path, {
-      foreignKey: 'userId',
-      as: 'paths',
-    });
-  };
+    gender: {
+      type: String,
+      required: false,
+    },
+    age: {
+      type: Number,
+      required: false,
+    },
+    weight: {
+      type: Number,
+      required: false,
+    },
+    height: {
+      type: Number,
+      required: false,
+    },
+  },
+  {
+    timestamps: true, // Adds createdAt and updatedAt fields
+  }
+);
 
-  return User;
-};
+const User = mongoose.model("User", UserSchema);
+
+module.exports = User;
