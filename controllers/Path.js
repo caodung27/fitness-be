@@ -1,9 +1,15 @@
-const Path = require("../models/Path"); // Ensure correct path to the Path model
-const { verifyToken } = require('../middleware/verifyToken');
+const Path = require("../models/Path");
+const createError = require("../error");
+const verifyToken = require("../middleware/verifyToken");
 
 const recordPath = async (req, res, next) => {
   try {
     const { type, start, end, speed } = req.body;
+
+    const userId = req.user._id;
+    console.log("userId: ", userId);
+
+    // Create new Path instance with userId included
     const newPath = new Path({
       userId: req.user._id,
       type,
@@ -13,7 +19,10 @@ const recordPath = async (req, res, next) => {
       date: new Date().toISOString().split('T')[0],
       time: new Date().toISOString().split('T')[1].split('.')[0]
     });
+
+    // Save the new Path document
     const savedPath = await newPath.save();
+
     res.status(200).json(savedPath);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -86,9 +95,9 @@ const searchPathsBySpeed = async (req, res, next) => {
 };
 
 module.exports = {
-  recordPath: [verifyToken, recordPath],
-  getPathHistory: [verifyToken, getPathHistory],
-  searchPathsByDateTime: [verifyToken, searchPathsByDateTime],
-  searchPathsByLocation: [verifyToken, searchPathsByLocation],
-  searchPathsBySpeed: [verifyToken, searchPathsBySpeed]
+  recordPath,
+  getPathHistory,
+  searchPathsByDateTime,
+  searchPathsByLocation,
+  searchPathsBySpeed
 };
