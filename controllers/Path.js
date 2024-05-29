@@ -7,9 +7,8 @@ const recordPath = async (req, res, next) => {
     const { type, start, end, speed } = req.body;
 
     const userId = req.user._id;
-    console.log("userId: ", userId);
+    // console.log("userId: ", userId);
 
-    // Create new Path instance with userId included
     const newPath = new Path({
       userId: req.user._id,
       type,
