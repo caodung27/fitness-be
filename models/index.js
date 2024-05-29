@@ -9,8 +9,8 @@ const mongoURI = process.env.MONGO_URI;
 async function connectDB() {
   try {
     await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
       useCreateIndex: true, // Ensure unique fields are indexed
       useFindAndModify: false // To suppress deprecation warnings for findOneAndUpdate
     });
