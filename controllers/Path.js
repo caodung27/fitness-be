@@ -11,8 +11,8 @@ const recordPath = async (req, res, next) => {
       start,
       end,
       speed,
-      date: new Date().toISOString().split('T')[0], // Cập nhật trường date
-      time: new Date().toISOString().split('T')[1].split('.')[0] // Cập nhật trường time
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toISOString().split('T')[1].split('.')[0] 
     });
     res.status(200).json(newPath);
   } catch (err) {
@@ -39,12 +39,9 @@ const searchPathsByDateTime = async (req, res, next) => {
     let startDateTime, endDateTime;
 
     if (time) {
-      // Nếu có thời gian, tạo ngày giờ bắt đầu và kết thúc dựa trên ngày và thời gian
       startDateTime = new Date(`${date}T${time}`);
       endDateTime = new Date(startDateTime);
-      endDateTime.setHours(endDateTime.getHours() + 1); // Thêm 1 giờ
-    } else {
-      // Nếu không có thời gian, tạo ngày giờ bắt đầu và kết thúc dựa trên ngày
+      endDateTime.setHours(endDateTime.getHours() + 1); 
       startDateTime = new Date(`${date}T00:00:00`);
       endDateTime = new Date(`${date}T23:59:59`);
     }
@@ -52,7 +49,7 @@ const searchPathsByDateTime = async (req, res, next) => {
     const pathData = await db.models.Path.findAll({
       where: {
         userId: req.user.id,
-        createdAt: { [Op.between]: [startDateTime, endDateTime] } // Tìm kiếm theo trường createdAt
+        createdAt: { [Op.between]: [startDateTime, endDateTime] }
       }
     });
     res.status(200).json(pathData);
