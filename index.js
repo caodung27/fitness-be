@@ -10,9 +10,9 @@ const pathRouter = require("./routes/Path");
 dotenv.config();
 
 // Middleware
-// app.use(cors()); 
+// app.use(cors());
 const corsOptions = {
-  origin: '*',
+  origin: "*",
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -24,14 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRouter); // Authentication routes
 app.use("/user", userRouter); // User-related routes
 app.use("/:userId/path", pathRouter); // Path-related routes
-
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, "admin/build")));
-
-// The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "admin/build", "index.html"));
-});
 
 // Error handler middleware
 app.use((err, req, res, next) => {
