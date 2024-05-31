@@ -12,10 +12,12 @@ dotenv.config();
 // Middleware
 // app.use(cors());
 const corsOptions = {
-  origin: "*",
+  origin: '*',
   optionsSuccessStatus: 200,
+  exposedHeaders: 'Content-Range', // Ensure Content-Range is exposed
 };
 app.use(cors(corsOptions));
+
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
