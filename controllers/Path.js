@@ -101,6 +101,7 @@ const searchPathsBySpeed = async (req, res, next) => {
 
 module.exports = {
   recordPath,
+  getAllPaths,
   getPathHistory,
   searchPathsByDateTime,
   searchPathsByLocation,
