@@ -6,8 +6,10 @@ const recordPath = async (req, res, next) => {
   try {
     const { type, start, end, speed } = req.body;
 
-    const userId = req.user._id;
-    // console.log("userId: ", userId);
+    // Kiểm tra tồn tại của req.user trước khi truy cập vào _id
+    if (!req.user || !req.user._id) {
+      throw new Error('User not authenticated or user ID not provided');
+    }
 
     const newPath = new Path({
       userId: req.user._id,
@@ -19,7 +21,6 @@ const recordPath = async (req, res, next) => {
       time: new Date().toISOString().split('T')[1].split('.')[0]
     });
 
-    // Save the new Path document
     const savedPath = await newPath.save();
 
     res.status(200).json(savedPath);
@@ -30,6 +31,11 @@ const recordPath = async (req, res, next) => {
 
 const getPathHistory = async (req, res, next) => {
   try {
+    // Kiểm tra tồn tại của req.user trước khi truy cập vào _id
+    if (!req.user || !req.user._id) {
+      throw new Error('User not authenticated or user ID not provided');
+    }
+
     const pathData = await Path.find({ userId: req.user._id });
     res.status(200).json(pathData);
   } catch (err) {
@@ -51,6 +57,11 @@ const searchPathsByDateTime = async (req, res, next) => {
       endDateTime = new Date(`${date}T23:59:59`);
     }
 
+    // Kiểm tra tồn tại của req.user trước khi truy cập vào _id
+    if (!req.user || !req.user._id) {
+      throw new Error('User not authenticated or user ID not provided');
+    }
+
     const pathData = await Path.find({
       userId: req.user._id,
       createdAt: { $gte: startDateTime, $lt: endDateTime }
@@ -70,6 +81,12 @@ const searchPathsByLocation = async (req, res, next) => {
     if (location) {
       query.location = new RegExp(location, 'i');
     }
+
+    // Kiểm tra tồn tại của req.user trước khi truy cập vào _id
+    if (!req.user || !req.user._id) {
+      throw new Error('User not authenticated or user ID not provided');
+    }
+
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
   } catch (err) {
@@ -86,6 +103,12 @@ const searchPathsBySpeed = async (req, res, next) => {
     if (speed) {
       query.speed = speed;
     }
+
+    // Kiểm tra tồn tại của req.user trước khi truy cập vào _id
+    if (!req.user || !req.user._id) {
+      throw new Error('User not authenticated or user ID not provided');
+    }
+
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
   } catch (err) {
