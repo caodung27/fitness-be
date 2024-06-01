@@ -14,9 +14,7 @@ const recordPath = async (req, res, next) => {
       createdAt: new Date().toISOString(),
     });
 
-    // Save the new Path document
     const savedPath = await newPath.save();
-
     res.status(200).json(savedPath);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -25,25 +23,14 @@ const recordPath = async (req, res, next) => {
 
 const getAllPaths = async (req, res, next) => {
   try {
-    const { type, start, end, speed, createdAt, page, perPage, sort } = req.query;
-
-    const filter = {};
-    if (type) filter.type = type;
-    if (start) filter["start.coordinates"] = start; 
-    if (end) filter["end.coordinates"] = end;
-    if (speed) filter.speed = speed;
-    if (createdAt) filter.createdAt = { $gte: new Date(createdAt) };
-
-    const sortQuery = sort ? { [sort.field]: sort.order === 'ASC' ? 1 : -1 } : {};
-
-    const paths = await Path.find(filter)
-                            .sort(sortQuery)
-                            .skip((page - 1) * perPage)
-                            .limit(perPage);
-
-    const total = await Path.countDocuments(filter);
-
-    res.status(200).json({ data: paths, total });
+    const { filter } = req.query;
+    let query = {};
+    if (filter) {
+      const parsedFilter = JSON.parse(filter);
+      query = { ...parsedFilter };
+    }
+    const paths = await Path.find(query);
+    res.status(200).json({ paths });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -51,7 +38,7 @@ const getAllPaths = async (req, res, next) => {
 
 const getPathHistory = async (req, res, next) => {
   try {
-    const { userId } = req.query; // or req.body if you prefer to pass userId as a request body parameter
+    const { userId } = req.query;
     const pathData = await Path.find({ userId });
     res.status(200).json(pathData);
   } catch (err) {
@@ -156,3 +143,4 @@ module.exports = {
   updatePathById,
   deletePathById
 };
+

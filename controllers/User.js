@@ -1,14 +1,20 @@
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
 const createError = require("../error.js");
-const User = require("../models/User"); // Ensure correct path to the User model
+const User = require("../models/User");
 
 dotenv.config();
 
 // Lấy danh sách tất cả người dùng
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const { filter } = req.query;
+    let query = {};
+    if (filter) {
+      const parsedFilter = JSON.parse(filter);
+      query = { ...parsedFilter };
+    }
+    const users = await User.find(query);
     return res.status(200).json({ users });
   } catch (error) {
     return next(error);
