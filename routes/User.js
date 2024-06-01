@@ -6,6 +6,6 @@ router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.put("/:id", updateUser);
 router.delete("/:id", deleteUserById);
-router.get('/users/search', searchUsers);
+router.get('/search', searchUsers);
 
 module.exports = router;

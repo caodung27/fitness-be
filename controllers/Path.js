@@ -25,12 +25,29 @@ const recordPath = async (req, res, next) => {
 
 const getAllPaths = async (req, res, next) => {
   try {
-    const paths = await Path.find();
-    res.status(200).json({ paths });
+    const { type, start, end, speed, createdAt, page, perPage, sort } = req.query;
+
+    const filter = {};
+    if (type) filter.type = type;
+    if (start) filter["start.coordinates"] = start; 
+    if (end) filter["end.coordinates"] = end;
+    if (speed) filter.speed = speed;
+    if (createdAt) filter.createdAt = { $gte: new Date(createdAt) };
+
+    const sortQuery = sort ? { [sort.field]: sort.order === 'ASC' ? 1 : -1 } : {};
+
+    const paths = await Path.find(filter)
+                            .sort(sortQuery)
+                            .skip((page - 1) * perPage)
+                            .limit(perPage);
+
+    const total = await Path.countDocuments(filter);
+
+    res.status(200).json({ data: paths, total });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
+};
 
 const getPathHistory = async (req, res, next) => {
   try {
