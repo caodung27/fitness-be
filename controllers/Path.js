@@ -24,6 +24,15 @@ const recordPath = async (req, res, next) => {
   }
 };
 
+const getAllPaths = async (req, res, next) => {
+  try {
+    const paths = await Path.find();
+    res.status(200).json({ paths });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 const getPathHistory = async (req, res, next) => {
   try {
     const { userId } = req.body; // or req.query if you prefer to pass userId as a query parameter
