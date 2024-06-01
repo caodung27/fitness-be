@@ -9,7 +9,7 @@ router.post("/create", recordPath);
 
 // Get path
 router.get("/", getAllPaths);
-router.get("/:userId/", getAllPaths);
+router.get("/:userId/", getPathHistory);
 
 // Search paths
 router.get("/search/date-time", searchPathsByDateTime);
