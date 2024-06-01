@@ -66,12 +66,15 @@ const searchPathsByDateTime = async (req, res, next) => {
 const searchPathsByLocation = async (req, res, next) => {
   try {
     const { location, userId } = req.query;
-    const query = { userId };
+    let query = { userId };
     if (location) {
-      query.$or = [
-        { 'start.location': { $regex: location, $options: 'i' } },
-        { 'end.location': { $regex: location, $options: 'i' } }
-      ];
+      query = {
+        userId,
+        $or: [
+          { 'start.location': { $regex: location, $options: 'i' } },
+          { 'end.location': { $regex: location, $options: 'i' } }
+        ]
+      };
     }
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
@@ -83,27 +86,7 @@ const searchPathsByLocation = async (req, res, next) => {
 const searchPathsBySpeed = async (req, res, next) => {
   try {
     const { speed, userId } = req.query;
-    const pathData = await Path.find({ userId, speed });
-    res.status(200).json(pathData);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const searchPathsByFilter = async (req, res, next) => {
-  try {
-    const { type, start, end, speed, createdAt, userId } = req.query;
-    const query = { userId };
-    if (type) query.type = type;
-    if (start) query['start.location'] = start;
-    if (end) query['end.location'] = end;
-    if (speed) query.speed = speed;
-    if (createdAt) {
-      const startDate = new Date(createdAt);
-      const endDate = new Date(createdAt);
-      endDate.setDate(endDate.getDate() + 1);
-      query.createdAt = { $gte: startDate, $lt: endDate };
-    }
+    const query = { userId, speed };
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
   } catch (err) {
@@ -139,8 +122,6 @@ module.exports = {
   searchPathsByDateTime,
   searchPathsByLocation,
   searchPathsBySpeed,
-  searchPathsByFilter,
   updatePathById,
   deletePathById
 };
-

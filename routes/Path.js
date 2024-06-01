@@ -6,7 +6,6 @@ const {
   searchPathsByLocation,
   searchPathsBySpeed,
   searchPathsByDateTime,
-  searchPathsByFilter,
 } = require("../controllers/Path");
 const { updatePathById, deletePathById } = require("../controllers/Path");
 
@@ -23,7 +22,6 @@ router.get("/:userId/", getPathHistory);
 router.get("/search/date-time", searchPathsByDateTime);
 router.get("/search/location", searchPathsByLocation);
 router.get("/search/speed", searchPathsBySpeed);
-router.get("/search/filter", searchPathsByFilter);
 
 router.put("/:id", updatePathById);
 router.delete("/:id", deletePathById);
