@@ -99,11 +99,34 @@ const searchPathsBySpeed = async (req, res, next) => {
   }
 };
 
+const updatePathById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { type, start, end, speed, userId } = req.body;
+    const updatedPath = await Path.findByIdAndUpdate(id, { type, start, end, speed, userId }, { new: true });
+    res.status(200).json(updatedPath);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deletePathById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedPath = await Path.findByIdAndDelete(id);
+    res.status(200).json(deletedPath);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   recordPath,
   getAllPaths,
   getPathHistory,
   searchPathsByDateTime,
   searchPathsByLocation,
-  searchPathsBySpeed
+  searchPathsBySpeed,
+  updatePathById,
+  deletePathById
 };
