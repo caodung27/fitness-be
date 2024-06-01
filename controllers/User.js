@@ -5,6 +5,7 @@ const User = require("../models/User"); // Ensure correct path to the User model
 
 dotenv.config();
 
+// Lấy danh sách tất cả người dùng
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find();
@@ -14,6 +15,7 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+// Lấy thông tin của một người dùng dựa trên ID
 const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -27,6 +29,7 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+// Cập nhật thông tin của một người dùng dựa trên ID
 const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -56,6 +59,7 @@ const updateUser = async (req, res, next) => {
   }
 };
 
+// Xóa người dùng dựa trên ID
 const deleteUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -70,9 +74,31 @@ const deleteUserById = async (req, res, next) => {
   }
 };
 
+// Tìm kiếm người dùng dựa trên các tiêu chí nhất định
+const searchUsers = async (req, res, next) => {
+  try {
+    const { name, email, gender, age, weight, height, location } = req.query;
+    let filter = {};
+
+    if (name) filter.name = new RegExp(name, 'i');
+    if (email) filter.email = new RegExp(email, 'i');
+    if (gender) filter.gender = gender;
+    if (age) filter.age = age;
+    if (weight) filter.weight = weight;
+    if (height) filter.height = height;
+    if (location) filter.location = new RegExp(location, 'i');
+
+    const users = await User.find(filter);
+    return res.status(200).json({ users });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   updateUser,
   deleteUserById,
+  searchUsers,
 };
