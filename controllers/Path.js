@@ -5,10 +5,6 @@ const recordPath = async (req, res, next) => {
   try {
     const { type, start, end, speed, userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID not provided' });
-    }
-
     const newPath = new Path({
       userId,
       type,
@@ -19,6 +15,7 @@ const recordPath = async (req, res, next) => {
       time: new Date().toISOString().split('T')[1].split('.')[0]
     });
 
+    // Save the new Path document
     const savedPath = await newPath.save();
 
     res.status(200).json(savedPath);
@@ -29,12 +26,7 @@ const recordPath = async (req, res, next) => {
 
 const getPathHistory = async (req, res, next) => {
   try {
-    const { userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID not provided' });
-    }
-
+    const { userId } = req.body; // or req.query if you prefer to pass userId as a query parameter
     const pathData = await Path.find({ userId });
     res.status(200).json(pathData);
   } catch (err) {
@@ -46,10 +38,6 @@ const searchPathsByDateTime = async (req, res, next) => {
   try {
     const { date, time, userId } = req.query;
     let startDateTime, endDateTime;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID not provided' });
-    }
 
     if (time) {
       startDateTime = new Date(`${date}T${time}`);
@@ -73,19 +61,12 @@ const searchPathsByDateTime = async (req, res, next) => {
 const searchPathsByLocation = async (req, res, next) => {
   try {
     const { location, userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID not provided' });
-    }
-
     const query = {
       userId
     };
-
     if (location) {
       query.location = new RegExp(location, 'i');
     }
-
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
   } catch (err) {
@@ -96,23 +77,16 @@ const searchPathsByLocation = async (req, res, next) => {
 const searchPathsBySpeed = async (req, res, next) => {
   try {
     const { speed, userId } = req.query;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID not provided' });
-    }
-
     const query = {
       userId,
     };
-
     if (speed) {
       query.speed = speed;
     }
-
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status (500).json({ error: err.message });
   }
 };
 
