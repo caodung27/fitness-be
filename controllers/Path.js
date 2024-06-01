@@ -102,8 +102,8 @@ const searchPathsBySpeed = async (req, res, next) => {
 const updatePathById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { type, start, end, speed, userId } = req.body;
-    const updatedPath = await Path.findByIdAndUpdate(id, { type, start, end, speed, userId }, { new: true });
+    const { type, start, end, speed } = req.body;
+    const updatedPath = await Path.findByIdAndUpdate(id, { type, start, end, speed }, { new: true });
     res.status(200).json(updatedPath);
   } catch (err) {
     res.status(500).json({ error: err.message });
