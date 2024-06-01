@@ -10,14 +10,22 @@ const pathRouter = require("./routes/Path");
 dotenv.config();
 
 // Middleware
-app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
-app.use(express.json({ limit: "50mb" })); // Parse JSON bodies with a limit
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+// app.use(cors());
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200,
+  exposedHeaders: 'Content-Range', // Ensure Content-Range is exposed
+};
+app.use(cors(corsOptions));
+
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/auth", authRouter); // Authentication routes
 app.use("/user", userRouter); // User-related routes
-app.use("/:userId/path", pathRouter); // Path-related routes
+app.use("/path", pathRouter); // Path-related routes
 
 // Error handler middleware
 app.use((err, req, res, next) => {

@@ -25,7 +25,7 @@ module.exports.verifyToken = function (req, res, next) {
         }
       }
       req.user = decode;
-      req.body.userId = decode._id; // Tự động gán userId từ req.user._id vào req.body.userId
+      // req.body.userId = decode._id; // Tự động gán userId từ req.user._id vào req.body.userId
       return next();
     });
   } catch (err) {

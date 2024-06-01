@@ -1,16 +1,12 @@
 const Path = require("../models/Path");
 const createError = require("../error");
-const verifyToken = require("../middleware/verifyToken");
 
 const recordPath = async (req, res, next) => {
   try {
-    const { type, start, end, speed } = req.body;
-
-    const userId = req.user._id;
-    // console.log("userId: ", userId);
+    const { type, start, end, speed, userId } = req.body;
 
     const newPath = new Path({
-      userId: req.user._id,
+      userId,
       type,
       start,
       end,
@@ -28,9 +24,19 @@ const recordPath = async (req, res, next) => {
   }
 };
 
+const getAllPaths = async (req, res, next) => {
+  try {
+    const paths = await Path.find();
+    res.status(200).json({ paths });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 const getPathHistory = async (req, res, next) => {
   try {
-    const pathData = await Path.find({ userId: req.user._id });
+    const { userId } = req.body; // or req.query if you prefer to pass userId as a query parameter
+    const pathData = await Path.find({ userId });
     res.status(200).json(pathData);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -39,7 +45,7 @@ const getPathHistory = async (req, res, next) => {
 
 const searchPathsByDateTime = async (req, res, next) => {
   try {
-    const { date, time } = req.query;
+    const { date, time, userId } = req.query;
     let startDateTime, endDateTime;
 
     if (time) {
@@ -52,7 +58,7 @@ const searchPathsByDateTime = async (req, res, next) => {
     }
 
     const pathData = await Path.find({
-      userId: req.user._id,
+      userId,
       createdAt: { $gte: startDateTime, $lt: endDateTime }
     });
     res.status(200).json(pathData);
@@ -63,9 +69,9 @@ const searchPathsByDateTime = async (req, res, next) => {
 
 const searchPathsByLocation = async (req, res, next) => {
   try {
-    const location = req.query.location;
+    const { location, userId } = req.query;
     const query = {
-      userId: req.user._id
+      userId
     };
     if (location) {
       query.location = new RegExp(location, 'i');
@@ -79,9 +85,9 @@ const searchPathsByLocation = async (req, res, next) => {
 
 const searchPathsBySpeed = async (req, res, next) => {
   try {
-    const { speed } = req.query;
+    const { speed, userId } = req.query;
     const query = {
-      userId: req.user._id,
+      userId,
     };
     if (speed) {
       query.speed = speed;
@@ -89,14 +95,38 @@ const searchPathsBySpeed = async (req, res, next) => {
     const pathData = await Path.find(query);
     res.status(200).json(pathData);
   } catch (err) {
+    res.status (500).json({ error: err.message });
+  }
+};
+
+const updatePathById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { type, start, end, speed, userId } = req.body;
+    const updatedPath = await Path.findByIdAndUpdate(id, { type, start, end, speed, userId }, { new: true });
+    res.status(200).json(updatedPath);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deletePathById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedPath = await Path.findByIdAndDelete(id);
+    res.status(200).json(deletedPath);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
 module.exports = {
   recordPath,
+  getAllPaths,
   getPathHistory,
   searchPathsByDateTime,
   searchPathsByLocation,
-  searchPathsBySpeed
+  searchPathsBySpeed,
+  updatePathById,
+  deletePathById
 };
