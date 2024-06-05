@@ -52,7 +52,12 @@ const updateUser = async (req, res, next) => {
       user.password = hashedPassword;
     }
     user.gender = gender || user.gender;
-    user.birthday = birthday || user.birthday;
+
+    if (birthday) {
+      const [day, month, year] = birthday.split('/');
+      user.birthday = new Date(`${year}-${month}-${day}`);
+    }
+
     user.weight = weight || user.weight;
     user.height = height || user.height;
     user.phone = phone || user.phone;
@@ -83,13 +88,16 @@ const deleteUserById = async (req, res, next) => {
 // Tìm kiếm người dùng dựa trên các tiêu chí nhất định
 const searchUsers = async (req, res, next) => {
   try {
-    const { name, email, gender, age, weight, height, location } = req.query;
+    const { name, email, gender, birthday, weight, height, location } = req.query;
     let filter = {};
 
     if (name) filter.name = new RegExp(name, 'i');
     if (email) filter.email = new RegExp(email, 'i');
     if (gender) filter.gender = gender;
-    if (birthday) filter.birthday = birthday;
+    if (birthday) {
+      const [day, month, year] = birthday.split('/');
+      filter.birthday = new Date(`${year}-${month}-${day}`);
+    }
     if (weight) filter.weight = weight;
     if (height) filter.height = height;
     if (location) filter.location = new RegExp(location, 'i');
