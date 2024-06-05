@@ -15,15 +15,15 @@ const router = express.Router();
 router.post("/:userId/create", recordPath);
 
 // Get path
-router.get("/", getAllPaths);
-router.get("/:id", getPathById);
+router.get("/:userId/", getAllPaths);
+router.get("/:userId/:id", getPathById);
 
 // Search paths
-router.get("/search/date-time", searchPathsByDateTime);
-router.get("/search/location", searchPathsByLocation);
-router.get("/search/speed", searchPathsBySpeed);
+router.get("/:userId/search/date-time", searchPathsByDateTime);
+router.get("/:userId/search/location", searchPathsByLocation);
+router.get("/:userId/search/speed", searchPathsBySpeed);
 
-router.put("/:id", updatePathById);
-router.delete("/:id", deletePathById);
+router.put("/:userId/:id", updatePathById);
+router.delete("/:userId/:id", deletePathById);
 
 module.exports = router;
