@@ -39,7 +39,7 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, password, gender, age, weight, height, phone, location } = req.body;
+    const { name, password, gender, birthday, weight, height, phone, location } = req.body;
     const user = await User.findById(id);
     if (!user) {
       return next(createError(404, "User not found"));
@@ -52,7 +52,7 @@ const updateUser = async (req, res, next) => {
       user.password = hashedPassword;
     }
     user.gender = gender || user.gender;
-    user.age = age || user.age;
+    user.birthday = birthday || user.birthday;
     user.weight = weight || user.weight;
     user.height = height || user.height;
     user.phone = phone || user.phone;
@@ -89,7 +89,7 @@ const searchUsers = async (req, res, next) => {
     if (name) filter.name = new RegExp(name, 'i');
     if (email) filter.email = new RegExp(email, 'i');
     if (gender) filter.gender = gender;
-    if (age) filter.age = age;
+    if (birthday) filter.birthday = birthday;
     if (weight) filter.weight = weight;
     if (height) filter.height = height;
     if (location) filter.location = new RegExp(location, 'i');

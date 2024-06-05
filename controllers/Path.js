@@ -36,11 +36,11 @@ const getAllPaths = async (req, res, next) => {
   }
 };
 
-const getPathHistory = async (req, res, next) => {
+const getPathById = async (req, res, next) => {
   try {
-    const { userId } = req.query;
-    const pathData = await Path.find({ userId });
-    res.status(200).json(pathData);
+    const { id } = req.params;
+    const path = await Path.findById(id);
+    res.status(200).json(path);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -118,7 +118,7 @@ const deletePathById = async (req, res, next) => {
 module.exports = {
   recordPath,
   getAllPaths,
-  getPathHistory,
+  getPathById,
   searchPathsByDateTime,
   searchPathsByLocation,
   searchPathsBySpeed,
