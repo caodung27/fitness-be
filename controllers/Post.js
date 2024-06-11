@@ -128,8 +128,8 @@ exports.createComment = async (req, res) => {
       user_id,
       comment,
       reactions: newReactions || [],
-      username: user.username, // Add username
-      avatarUrl: user.avatarUrl, // Add avatarUrl
+      username: user.name,
+      avatarUrl: user.avatarUrl,
     };
 
     post.comments.push(newComment);
