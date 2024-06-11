@@ -62,7 +62,7 @@ const updateUser = async (req, res, next) => {
     user.height = height || user.height;
     user.phone = phone || user.phone;
     user.location = location || user.location;
-    user.avatarUrl = location || user.avatarUrl;
+    user.avatarUrl = avatarUrl || user.avatarUrl;
 
     const updatedUser = await user.save();
     return res.status(200).json({ message: 'User updated successfully', user: updatedUser });
