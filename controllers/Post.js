@@ -74,7 +74,8 @@ exports.deletePost = async (req, res) => {
 
 // Tạo comment cho một bài đăng
 exports.createComment = async (req, res) => {
-  const { postId, comment, reactions } = req.body;
+  const { userId, commentText, reactions } = req.body;
+  const postId = req.params.id; // Lấy postId từ URL param
 
   try {
     const post = await Post.findById(postId);
@@ -82,9 +83,15 @@ exports.createComment = async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
+    // Tìm thông tin của user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     const newComment = new Comment({
-      user: userId,
-      comment: comment,
+      user: user, // Sử dụng đối tượng user thay vì chỉ userId
+      comment: commentText,
       reactions: reactions || [],
     });
 
