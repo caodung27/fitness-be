@@ -39,6 +39,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
+    avatarUrl: {
+      type: String,
+      required: false
+    }
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields

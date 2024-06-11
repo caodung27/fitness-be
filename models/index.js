@@ -29,5 +29,7 @@ const db = {};
 db.mongoose = mongoose; // Expose mongoose instance
 db.User = require("./User")(mongoose);
 db.Path = require("./Path")(mongoose);
+db.Post = require("./Post")(mongoose);
+db.Comment = require("./Comment")(mongoose);
 
 module.exports = db;

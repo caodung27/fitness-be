@@ -8,7 +8,6 @@ const {
   getPathById,
 } = require("../controllers/Path");
 const { updatePathById, deletePathById } = require("../controllers/Path");
-
 const router = express.Router();
 
 // Record a new path

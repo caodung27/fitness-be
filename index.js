@@ -6,6 +6,8 @@ const dotenv = require("dotenv");
 const userRouter = require("./routes/User");
 const authRouter = require("./routes/Auth");
 const pathRouter = require("./routes/Path");
+const postRoutes = require("./routes/Post");
+const commentRoutes = require("./routes/Comment");
 
 dotenv.config();
 
@@ -26,6 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRouter); // Authentication routes
 app.use("/user", userRouter); // User-related routes
 app.use("/path", pathRouter); // Path-related routes
+app.use("/post", postRoutes);
+app.use("/comment", commentRoutes);
 
 // Error handler middleware
 app.use((err, req, res, next) => {
