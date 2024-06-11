@@ -1,6 +1,7 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 
-// Tạo một bài đăng mới
+// Tạo bài đăng mới
 exports.createPost = async (req, res) => {
   try {
     const { user_id, description, mediaUrl } = req.body;
@@ -9,7 +10,7 @@ exports.createPost = async (req, res) => {
       description,
       mediaUrl,
       likes: {},
-      comments: []  // Khởi tạo mảng comments rỗng
+      comments: []
     });
     const savedPost = await newPost.save();
     res.status(201).json(savedPost);
@@ -74,52 +75,56 @@ exports.deletePost = async (req, res) => {
 
 // Tạo comment cho một bài đăng
 exports.createComment = async (req, res) => {
-  const { userId, commentText, reactions } = req.body;
-  const postId = req.params.id; // Lấy postId từ URL param
+  const { user_id, comment, reactions } = req.body;
+  const postId = req.params.id;
+
+  if (!user_id || !comment) {
+    return res.status(400).json({ error: "user_id and comment are required fields" });
+  }
 
   try {
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const newReactions = reactions.map(reaction => ({
+      user: reaction.user_id, // Assuming reaction has user_id field
+      reactionType: reaction.reactionType,
+    }));
+
+    const newComment = {
+      user: user_id, // Store user_id directly
+      comment,
+      reactions: newReactions || [],
+    };
+
     const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    // Tìm thông tin của user
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const newComment = new Comment({
-      user: user, // Sử dụng đối tượng user thay vì chỉ userId
-      comment: commentText,
-      reactions: reactions || [],
-    });
-
-    await newComment.save();
-
     post.comments.push(newComment);
-    await post.save();
+    const updatedPost = await post.save();
 
-    // Populate lại thông tin người dùng và các phản ứng trong comment
-    await newComment.populate("user reactions.user").execPopulate();
-
-    res.status(201).json(newComment);
+    res.status(201).json(updatedPost);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
 // Lấy tất cả các comment của một bài đăng
 exports.getCommentsByPostId = async (req, res) => {
   try {
     const postId = req.params.id;
-    const comments = await Comment.find({ post: postId }).populate("user reactions.user");
-    res.status(200).json(comments);
+    const post = await Post.findById(postId).populate("comments.user comments.reactions.user");
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    res.status(200).json(post.comments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // Cập nhật các comment của một bài đăng
 exports.updateCommentsForPost = async (req, res) => {
@@ -130,14 +135,11 @@ exports.updateCommentsForPost = async (req, res) => {
       req.params.id,
       { comments },
       { new: true }
-    ).populate("comments.user reactions.user");
+    ).populate("comments.user comments.reactions.user");
 
     if (!updatedPost) {
       return res.status(404).json({ error: "Post not found" });
     }
-
-    // Populate lại thông tin người dùng và các phản ứng trong mỗi bình luận
-    await updatedPost.populate("comments.user reactions.user").execPopulate();
 
     res.status(200).json(updatedPost.comments);
   } catch (err) {
