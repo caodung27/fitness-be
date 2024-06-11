@@ -1,53 +1,25 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const reactionSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true, // Ensure user is required
-  },
-  reactionType: {
-    type: String,
-    required: true,
-    enum: ["like", "dislike"], // Example enum for reaction types
-  },
+const reactionSchema = new Schema({
+  user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  reactionType: { type: String, required: true }
 });
 
-const commentSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  comment: {
-    type: String,
-    required: true,
-  },
-  reactions: [reactionSchema],
-}, { timestamps: true });
+const commentSchema = new Schema({
+  user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  comment: { type: String, required: true },
+  reactions: [reactionSchema]
+});
 
-const postSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  mediaUrl: {
-    type: String,
-    required: true,
-  },
-  likes: {
-    type: Map,
-    of: Boolean,
-    default: {},
-  },
-  comments: [commentSchema],
-}, { timestamps: true });
+const postSchema = new Schema({
+  user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  description: { type: String, required: true },
+  mediaUrl: { type: String },
+  likes: { type: Object, default: {} },
+  comments: [commentSchema]
+});
 
-const Post = mongoose.model("Post", postSchema);
+const Post = mongoose.model('Post', postSchema);
 
 module.exports = Post;
