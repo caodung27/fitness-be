@@ -5,6 +5,7 @@ const {
   getPostById,
   updatePost,
   deletePost,
+  getPostsByUserId,
   createComment,
   getCommentsByPostId,
   updateCommentsForPost,
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post("/", createPost);
 router.get("/", getAllPosts);
 router.get("/:id", getPostById);
+router.get("/user/:userId", getPostsByUserId);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
 

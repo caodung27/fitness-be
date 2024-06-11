@@ -73,6 +73,23 @@ exports.deletePost = async (req, res) => {
   }
 };
 
+// Lấy các bài đăng của một người dùng dựa trên user_id và populate thông tin người dùng
+exports.getPostsByUserId = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const posts = await Post.find({ 'user_id': userId }).populate('user_id', ['name', 'avatarUrl']);
+    
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ error: "No posts found for this user" });
+    }
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Hàm lấy thông tin người dùng từ user_id
 const getUserById = async (userId) => {
   try {
