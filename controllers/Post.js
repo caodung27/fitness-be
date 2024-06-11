@@ -91,7 +91,7 @@ const updateCommentsWithUserInfo = async (comments) => {
   try {
     for (let comment of comments) {
       const user = await getUserById(comment.user_id);
-      comment.username = user.username;
+      comment.username = user.name;
       comment.avatarUrl = user.avatarUrl;
     }
     return comments;
@@ -157,6 +157,7 @@ exports.getCommentsByPostId = async (req, res) => {
 
     // Cập nhật username và avatarUrl cho từng comment
     const comments = await updateCommentsWithUserInfo(post.comments);
+    console.log(comments);
 
     // Return comments with username and avatarUrl
     res.status(200).json(comments.map(comment => ({
