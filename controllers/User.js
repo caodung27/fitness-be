@@ -39,7 +39,7 @@ const getUserById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, password, gender, birthday, weight, height, phone, location } = req.body;
+    const { name, password, gender, birthday, weight, height, phone, location, avatarUrl } = req.body;
     const user = await User.findById(id);
     if (!user) {
       return next(createError(404, "User not found"));
@@ -62,6 +62,7 @@ const updateUser = async (req, res, next) => {
     user.height = height || user.height;
     user.phone = phone || user.phone;
     user.location = location || user.location;
+    user.avatarUrl = location || user.avatarUrl;
 
     const updatedUser = await user.save();
     return res.status(200).json({ message: 'User updated successfully', user: updatedUser });
