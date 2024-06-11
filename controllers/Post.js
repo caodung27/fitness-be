@@ -74,7 +74,7 @@ exports.deletePost = async (req, res) => {
 
 // Tạo comment cho một bài đăng
 exports.createComment = async (req, res) => {
-  const { userId, postId, commentText, reactions } = req.body;
+  const { postId, comment, reactions } = req.body;
 
   try {
     const post = await Post.findById(postId);
@@ -84,7 +84,7 @@ exports.createComment = async (req, res) => {
 
     const newComment = new Comment({
       user: userId,
-      comment: commentText,
+      comment: comment,
       reactions: reactions || [],
     });
 
