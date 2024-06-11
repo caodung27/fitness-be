@@ -73,6 +73,33 @@ exports.deletePost = async (req, res) => {
   }
 };
 
+// Hàm lấy thông tin người dùng từ user_id
+const getUserById = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw createError(404, "User not found");
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Cập nhật username và avatarUrl cho từng comment
+const updateCommentsWithUserInfo = async (comments) => {
+  try {
+    for (let comment of comments) {
+      const user = await getUserById(comment.user_id);
+      comment.username = user.username;
+      comment.avatarUrl = user.avatarUrl;
+    }
+    return comments;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Tạo comment cho một bài đăng
 exports.createComment = async (req, res) => {
   const { user_id, comment, reactions } = req.body;
@@ -88,20 +115,17 @@ exports.createComment = async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    // Validate user_id exists
-    const user = await User.findById(user_id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    // Lấy thông tin người dùng từ user_id
+    const user = await getUserById(user_id);
 
     // Prepare reactions with user_id
     const newReactions = reactions.map(reaction => ({
-      user_id: user_id, // Assuming reaction has user_id field
+      user_id: user_id,
       reactionType: reaction.reactionType,
     }));
 
     const newComment = {
-      user_id, // Store user_id directly
+      user_id,
       comment,
       reactions: newReactions || [],
     };
@@ -109,9 +133,13 @@ exports.createComment = async (req, res) => {
     post.comments.push(newComment);
     const updatedPost = await post.save();
 
+    // Cập nhật username và avatarUrl cho comment mới
+    newComment.username = user.username;
+    newComment.avatarUrl = user.avatarUrl;
+
     res.status(201).json(updatedPost);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 };
 
@@ -119,11 +147,15 @@ exports.createComment = async (req, res) => {
 exports.getCommentsByPostId = async (req, res) => {
   try {
     const postId = req.params.id;
-    const post = await Post.findById(postId).populate("comments.user_id comments.reactions.user_id");
+    const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
-    res.status(200).json(post.comments);
+
+    // Cập nhật username và avatarUrl cho từng comment
+    const comments = await updateCommentsWithUserInfo(post.comments);
+
+    res.status(200).json(comments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -138,13 +170,16 @@ exports.updateCommentsForPost = async (req, res) => {
       req.params.id,
       { comments },
       { new: true }
-    ).populate("comments.user_id comments.reactions.user_id");
+    );
 
     if (!updatedPost) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    res.status(200).json(updatedPost.comments);
+    // Cập nhật username và avatarUrl cho từng comment
+    const updatedComments = await updateCommentsWithUserInfo(updatedPost.comments);
+
+    res.status(200).json(updatedComments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
