@@ -9,7 +9,9 @@ const reactionSchema = new Schema({
 const commentSchema = new Schema({
   user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   comment: { type: String, required: true },
-  reactions: [reactionSchema]
+  reactions: [reactionSchema],
+  username: { type: String },
+  avatarUrl: { type: String },
 });
 
 const postSchema = new Schema({

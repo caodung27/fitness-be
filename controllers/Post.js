@@ -128,16 +128,19 @@ exports.createComment = async (req, res) => {
       user_id,
       comment,
       reactions: newReactions || [],
+      username: user.username, // Add username
+      avatarUrl: user.avatarUrl, // Add avatarUrl
     };
 
     post.comments.push(newComment);
     const updatedPost = await post.save();
 
-    // Cập nhật username và avatarUrl cho comment mới
-    newComment.username = user.username;
-    newComment.avatarUrl = user.avatarUrl;
-
-    res.status(201).json(updatedPost);
+    // Return the updated post with comments containing username and avatarUrl
+    res.status(201).json(updatedPost.comments.map(comment => ({
+      ...comment.toJSON(),
+      username: comment.username,
+      avatarUrl: comment.avatarUrl,
+    })));
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
   }
@@ -155,7 +158,12 @@ exports.getCommentsByPostId = async (req, res) => {
     // Cập nhật username và avatarUrl cho từng comment
     const comments = await updateCommentsWithUserInfo(post.comments);
 
-    res.status(200).json(comments);
+    // Return comments with username and avatarUrl
+    res.status(200).json(comments.map(comment => ({
+      ...comment.toJSON(),
+      username: comment.username,
+      avatarUrl: comment.avatarUrl,
+    })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -179,8 +187,13 @@ exports.updateCommentsForPost = async (req, res) => {
     // Cập nhật username và avatarUrl cho từng comment
     const updatedComments = await updateCommentsWithUserInfo(updatedPost.comments);
 
-    res.status(200).json(updatedComments);
+    // Return updated comments with username and avatarUrl
+    res.status(200).json(updatedComments.map(comment => ({
+      ...comment.toJSON(),
+      username: comment.username,
+      avatarUrl: comment.avatarUrl,
+    })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};
+};gt
