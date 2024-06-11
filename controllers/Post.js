@@ -119,7 +119,7 @@ exports.createComment = async (req, res) => {
 exports.getCommentsByPostId = async (req, res) => {
   try {
     const postId = req.params.id;
-    const post = await Post.findById(postId).populate("comments.user comments.reactions.user");
+    const post = await Post.findById(postId).populate("comments.user_id comments.reactions.user_id");
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
@@ -138,7 +138,7 @@ exports.updateCommentsForPost = async (req, res) => {
       req.params.id,
       { comments },
       { new: true }
-    ).populate("comments.user comments.reactions.user");
+    ).populate("comments.user_id comments.reactions.user_id");
 
     if (!updatedPost) {
       return res.status(404).json({ error: "Post not found" });
