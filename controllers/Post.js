@@ -40,7 +40,7 @@ exports.getPostById = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};
+};  
 
 // Cập nhật bài đăng
 exports.updatePost = async (req, res) => {
@@ -83,26 +83,28 @@ exports.createComment = async (req, res) => {
   }
 
   try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Validate user_id exists
     const user = await User.findById(user_id);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Prepare reactions with user_id
     const newReactions = reactions.map(reaction => ({
-      user: reaction.user_id, // Assuming reaction has user_id field
+      user_id: user_id, // Assuming reaction has user_id field
       reactionType: reaction.reactionType,
     }));
 
     const newComment = {
-      user: user_id, // Store user_id directly
+      user_id, // Store user_id directly
       comment,
       reactions: newReactions || [],
     };
-
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
 
     post.comments.push(newComment);
     const updatedPost = await post.save();
@@ -112,6 +114,7 @@ exports.createComment = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 // Lấy tất cả các comment của một bài đăng
 exports.getCommentsByPostId = async (req, res) => {
   try {
