@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
 const reactionSchema = new mongoose.Schema({
-  user_id: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: true, // Ensure user is required
   },
   reactionType: {
     type: String,
     required: true,
-    enum: ["like", "dislike"], // Nếu chỉ có 2 loại reaction là like và dislike
+    enum: ["like", "dislike"], // Example enum for reaction types
   },
 });
 
@@ -23,36 +23,31 @@ const commentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  reactions: [reactionSchema], // Mảng các reactions cho comment
+  reactions: [reactionSchema],
 }, { timestamps: true });
 
-const PostSchema = new mongoose.Schema(
-  {
-    user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    mediaUrl: {
-      type: String,
-      required: true,
-    },
-    likes: {
-      type: Map,
-      of: Boolean,
-      default: {},
-    },
-    comments: [commentSchema], // Mảng các bình luận cho bài đăng
+const postSchema = new mongoose.Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
-  {
-    timestamps: true,
-  }
-);
+  description: {
+    type: String,
+    required: true,
+  },
+  mediaUrl: {
+    type: String,
+    required: true,
+  },
+  likes: {
+    type: Map,
+    of: Boolean,
+    default: {},
+  },
+  comments: [commentSchema],
+}, { timestamps: true });
 
-const Post = mongoose.model("Post", PostSchema);
+const Post = mongoose.model("Post", postSchema);
 
 module.exports = Post;
