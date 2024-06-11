@@ -17,8 +17,8 @@ router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
 
 // Route để tạo comment cho bài đăng
-router.post("/:id/comments", createComment);
+router.post("/:id/comments/create", createComment);
 router.get("/:id/comments", getCommentsByPostId);
-router.put("/:id/comments", updateCommentsForPost);
+router.put("/:id/comments/update", updateCommentsForPost);
 
 module.exports = router;
