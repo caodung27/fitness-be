@@ -6,6 +6,8 @@ const {
   updatePost,
   deletePost,
   createComment,
+  getCommentsByPostId,
+  updateCommentsForPost,
 } = require("../controllers/Post");
 
 const router = express.Router();
