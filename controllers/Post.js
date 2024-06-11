@@ -74,48 +74,45 @@ exports.deletePost = async (req, res) => {
 
 // Tạo comment cho một bài đăng
 exports.createComment = async (req, res) => {
-    const { user_id, comment, reactions } = req.body;
-    const postId = req.params.id;
-  
-    if (!user_id || !comment) {
-      return res.status(400).json({ error: "user_id and comment are required fields" });
+  const { userId, postId, commentText, reactions } = req.body;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
     }
-  
-    try {
-      const post = await Post.findById(postId);
-  
-      if (!post) {
-        return res.status(404).json({ error: "Post not found" });
-      }
-  
-      const newComment = {
-        user_id,
-        comment,
-        reactions: reactions || [], // reactions có thể không được cung cấp
-      };
-  
-      post.comments.push(newComment);
-      const updatedPost = await post.save();
-  
-      res.status(201).json(updatedPost);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  };
+
+    const newComment = new Comment({
+      user: userId,
+      comment: commentText,
+      reactions: reactions || [],
+    });
+
+    await newComment.save();
+
+    post.comments.push(newComment);
+    await post.save();
+
+    // Populate lại thông tin người dùng và các phản ứng trong comment
+    await newComment.populate("user reactions.user").execPopulate();
+
+    res.status(201).json(newComment);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 // Lấy tất cả các comment của một bài đăng
 exports.getCommentsByPostId = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id).populate("comments.user_id");
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-    const comments = post.comments;
+    const postId = req.params.id;
+    const comments = await Comment.find({ post: postId }).populate("user reactions.user");
     res.status(200).json(comments);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // Cập nhật các comment của một bài đăng
 exports.updateCommentsForPost = async (req, res) => {
@@ -126,10 +123,15 @@ exports.updateCommentsForPost = async (req, res) => {
       req.params.id,
       { comments },
       { new: true }
-    ).populate("comments.user_id");
+    ).populate("comments.user reactions.user");
+
     if (!updatedPost) {
       return res.status(404).json({ error: "Post not found" });
     }
+
+    // Populate lại thông tin người dùng và các phản ứng trong mỗi bình luận
+    await updatedPost.populate("comments.user reactions.user").execPopulate();
+
     res.status(200).json(updatedPost.comments);
   } catch (err) {
     res.status(500).json({ error: err.message });

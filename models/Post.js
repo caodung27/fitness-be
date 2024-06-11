@@ -14,7 +14,7 @@ const reactionSchema = new mongoose.Schema({
 });
 
 const commentSchema = new mongoose.Schema({
-  user_id: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
