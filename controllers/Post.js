@@ -162,9 +162,77 @@ exports.createComment = async (req, res) => {
     res.status(err.status || 500).json({ error: err.message });
   }
 };
+exports.createCommentProfile = async (req, res) => {
+  const { user_id, comment, reactions } = req.body;
+  const postId = req.params.id;
+
+  if (!user_id || !comment) {
+    return res.status(400).json({ error: "user_id and comment are required fields" });
+  }
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Lấy thông tin người dùng từ user_id
+    const user = await getUserById(user_id);
+
+    // Prepare reactions with user_id
+    const newReactions = reactions.map(reaction => ({
+      user_id: user_id,
+      reactionType: reaction.reactionType,
+    }));
+
+    const newComment = {
+      user_id,
+      comment,
+      reactions: newReactions || [],
+      username: user.name,
+      avatarUrl: user.avatarUrl,
+    };
+
+    post.comments.push(newComment);
+    const updatedPost = await post.save();
+
+    // Return the updated post with comments containing username and avatarUrl
+    res.status(201).json(updatedPost.comments.map(comment => ({
+      ...comment.toJSON(),
+      username: comment.username,
+      avatarUrl: comment.avatarUrl,
+    })));
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+};
+
 
 // Lấy tất cả các comment của một bài đăng
 exports.getCommentsByPostId = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Cập nhật username và avatarUrl cho từng comment
+    const comments = await updateCommentsWithUserInfo(post.comments);
+    console.log(comments);
+
+    // Return comments with username and avatarUrl
+    res.status(200).json(comments.map(comment => ({
+      ...comment.toJSON(),
+      username: comment.username,
+      avatarUrl: comment.avatarUrl,
+    })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getCommentsByProfile = async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Post.findById(postId);
