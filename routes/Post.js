@@ -20,7 +20,7 @@ router.get("/", getAllPosts);
 router.get("/:id", getPostById);
 router.get("/user/:userId", getPostsByUserId);
 
-router.post("user/:id/comments/create", createCommentProfile);
+router.post("/:userId/:id/comments/create", createCommentProfile);
 router.get("/:userId/comments", getCommentsByProfile);
 router.put("/:id", updatePost);
 router.delete("/:id", deletePost);
