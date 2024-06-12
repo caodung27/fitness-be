@@ -9,11 +9,13 @@ const {
   createComment,
   getCommentsByPostId,
   updateCommentsForPost,
+  upload, 
 } = require("../controllers/Post");
 
 const router = express.Router();
 
-router.post("/", createPost);
+// router.post("/", createPost);
+router.post('/post', upload.single('mediaUrl'), createPost);
 router.get("/", getAllPosts);
 router.get("/:id", getPostById);
 router.get("/user/:userId", getPostsByUserId);

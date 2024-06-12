@@ -1,10 +1,53 @@
 const Post = require("../models/Post");
 const User = require("../models/User");
+const multer = require('multer');
 
 // Tạo bài đăng mới
+// exports.createPost = async (req, res) => {
+//   try {
+//     const { user_id, description, mediaUrl } = req.body;
+//     const newPost = new Post({
+//       user_id,
+//       description,
+//       mediaUrl,
+//       likes: {},
+//       comments: []
+//     });
+//     const savedPost = await newPost.save();
+//     res.status(201).json(savedPost);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
+// Lấy tất cả các bài đăng
+// exports.getAllPosts = async (req, res) => {
+//   try {
+//     const posts = await Post.find().populate("user_id");
+//     res.status(200).json(posts);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+module.exports.upload = upload;
+
+// Create new post
 exports.createPost = async (req, res) => {
   try {
-    const { user_id, description, mediaUrl } = req.body;
+    const { user_id, description } = req.body;
+    const mediaUrl = `/uploads/${req.file.filename}`;
     const newPost = new Post({
       user_id,
       description,
@@ -19,7 +62,7 @@ exports.createPost = async (req, res) => {
   }
 };
 
-// Lấy tất cả các bài đăng
+// Get all posts
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find().populate("user_id");
